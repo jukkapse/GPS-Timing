@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 
 /**
@@ -57,7 +58,7 @@ public class TimingActivity extends Activity {
         speed = (TextView) findViewById(R.id.speed);
 
         courseText.setText(course);
-       firstnameText.setText(runner[1]);
+        firstnameText.setText(runner[1]);
         lastnameText.setText(runner[2]);
         clubText.setText(runner[3]);
         travelledDistance = 0.0;
@@ -65,26 +66,26 @@ public class TimingActivity extends Activity {
         controls = new ArrayList<>();
         controlTimes = new ArrayList<>();
         Location control = new Location("2");
-        control.setLatitude(60.216863);
-        control.setLongitude(24.800957);
+        control.setLatitude(60.166775);
+        control.setLongitude(24.798710);
         Location control2 = new Location("2");
-        control2.setLatitude(60.217943);
-        control2.setLongitude(24.804139);
+        control2.setLatitude(60.163148);
+        control2.setLongitude(24.806030);
         Location control3 = new Location("2");
-        control3.setLatitude(60.218273);
-        control3.setLongitude(24.803218);
+        control3.setLatitude(60.160324);
+        control3.setLongitude(24.802151);
         Location control4 = new Location("2");
-        control4.setLatitude(60.217353);
-        control4.setLongitude(24.803618);
+        control4.setLatitude(60.159624);
+        control4.setLongitude(24.794984);
         Location control5 = new Location("2");
-        control5.setLatitude(60.216668);
-        control5.setLongitude(24.805458);
+        control5.setLatitude(60.162700);
+        control5.setLongitude(24.793379);
         Location control6 = new Location("2");
-        control6.setLatitude(60.214707);
-        control6.setLongitude(24.805573);
+        control6.setLatitude(60.165137);
+        control6.setLongitude(24.792941);
         Location control7 = new Location("2");
-        control7.setLatitude(60.214720);
-        control7.setLongitude(24.804029);
+        control7.setLatitude(60.167450);
+        control7.setLongitude(24.797156);
 
 
         controls.add(control);
@@ -136,6 +137,7 @@ public class TimingActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startButton.setEnabled(false);
+                MainActivity.stopBackgroundMusic();
                 new CountDownTimer(10000, 1000) {
                     public void onTick(long millisUntilFinished) {
                         if (millisUntilFinished / 1000 <= 5) {
@@ -192,7 +194,8 @@ public class TimingActivity extends Activity {
         Double cLon = control.getLongitude();
 
         //Radius around control where "punching" is allowed + GPS Accuracy!
-        Double rad = 0.00008 + (gps.getAccuracy() * Math.pow(10, -7));
+        Double rad = 0.00010;
+//                + (gps.getAccuracy() * Math.pow(10, -7));
 
         //Check if GPS location is inside control radius
         if ((Math.pow((lat - cLat), 2) + Math.pow((lon - cLon), 2)) < (Math.pow(rad, 2))) {
@@ -241,13 +244,4 @@ public class TimingActivity extends Activity {
         }
         return String.format("%.2f", distance);
     }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        // Remove the activity when its off the screen
-        finish();
-    }
-
 }

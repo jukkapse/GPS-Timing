@@ -70,6 +70,7 @@ public class SigninActivity extends AsyncTask<String, Void, String[]> {
     @Override
     protected void onPostExecute(String[] result) {
         if (result[0] != null) {
+      //      Intent i = new Intent(context, selectCourseActivity.class);
             Intent i = new Intent(context, TimingActivity.class);
             i.putExtra("Runner", result);
             context.startActivity(i);
@@ -77,5 +78,4 @@ public class SigninActivity extends AsyncTask<String, Void, String[]> {
             statusField.setText("Invalid username or password!");
         }
     }
-
 }

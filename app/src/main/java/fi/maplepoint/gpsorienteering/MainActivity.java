@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public class MainActivity extends Activity {
     private EditText usernameField, passwordField;
     public ArrayList<Location> controls = new ArrayList<>();
-    public MediaPlayer mediaPlayer;
+    public static MediaPlayer mediaPlayer;
     Context context;
 
     TextView status;
@@ -45,11 +45,7 @@ public class MainActivity extends Activity {
         passwordField = (EditText) findViewById(R.id.password);
 
         //Some background music
-        mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.forestsounds);
-        mediaPlayer.setLooping(true);
-        mediaPlayer.start();
-        mediaPlayer.setVolume(1.0f, 1.0f);
-
+        playBackgroundMusic();
 
         //Initialize login fields
         final Button power = (Button) findViewById(R.id.power);
@@ -62,9 +58,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 String username = usernameField.getText().toString();
                 String password = passwordField.getText().toString();
-                SigninActivity login = new SigninActivity(context, status);
-                login.execute(username, password);
-                mediaPlayer.release();
+                new SigninActivity(context, status).execute(username, password);
             }
         });
 
@@ -75,5 +69,25 @@ public class MainActivity extends Activity {
                 System.exit(0);
             }
         });
+    }
+
+    private void playBackgroundMusic() {
+        mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.forestsounds);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.start();
+        mediaPlayer.setVolume(1.0f, 1.0f);
+    }
+
+    @Override
+    public void onRestart(){
+        super.onRestart();
+        playBackgroundMusic();
+        usernameField.setText("");
+        passwordField.setText("");
+        status.setText("");
+    }
+
+    public static void stopBackgroundMusic() {
+        mediaPlayer.release();
     }
 }

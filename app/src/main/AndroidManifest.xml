@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".settingsActivity"
+            android:name=".selectCourseActivity"
             android:label="Get competition data"
             android:screenOrientation="portrait">
         </activity>
