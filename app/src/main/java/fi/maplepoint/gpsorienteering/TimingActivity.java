@@ -33,7 +33,7 @@ public class TimingActivity extends Activity {
     MediaPlayer controlBeep, startBeep;
     TextView firstnameText, lastnameText, courseText, clubText, distanceText, speed;
     ArrayList<Location> controls;
-    ArrayList<Integer> controlTimes;
+    ArrayList<Integer> legTimes;
     Double travelledDistance;
     String course, uuid;
     String[] runner;
@@ -41,7 +41,7 @@ public class TimingActivity extends Activity {
 
     // Dummy data
 
-    Integer cid, cnum;
+    Integer cid, cnum, controlTime;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +53,7 @@ public class TimingActivity extends Activity {
         cid = 1;
         cnum = 1;
         timing = false;
+        controlTime = 0;
         uuid = UUID.randomUUID().toString();
 
 
@@ -76,7 +77,7 @@ public class TimingActivity extends Activity {
         travelledDistance = 0.0;
 
         controls = new ArrayList<>();
-        controlTimes = new ArrayList<>();
+        legTimes = new ArrayList<>();
         Location control = new Location("2");
         control.setLatitude(60.167153);
         control.setLongitude(24.797313);
@@ -212,23 +213,24 @@ public class TimingActivity extends Activity {
         if ((Math.pow((lat - cLat), 2) + Math.pow((lon - cLon), 2)) < (Math.pow(rad, 2))) {
 
             //Punch control if timing is running
-            int controltime = 0;
+            int legTime = 0;
             if (timing) {
-                if (controlTimes.isEmpty()) {
-                    controltime = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000);
+                if (legTimes.isEmpty()) {
+                    legTime = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000);
                 } else {
-                    controltime = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000 - controlTimes.get(controlTimes.size() - 1));
+                    legTime = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000 - controlTime);
                 }
-                controlTimes.add(controltime);
+                legTimes.add(legTime);
+                controlTime += legTime;
 
                 //Punching signals
                 controlBeep.start();
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(1000);
-                courseText.setText(Integer.toString(controltime));
+                courseText.setText(Integer.toString(legTime));
 
-                //Next send controltime to the server
-                new controlTimingActivity(courseText).execute(Integer.toString(cid), runner[0], Integer.toString(cnum), Integer.toString(controltime),uuid);
+                //Next send legTime to the server
+                new controlTimingActivity(courseText).execute(Integer.toString(cid), runner[0], Integer.toString(cnum), Integer.toString(legTime),uuid);
 
 
                 //Remove punched control from controls list
