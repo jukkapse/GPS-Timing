@@ -19,6 +19,7 @@ import android.widget.Chronometer;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Timing activity takes care of active_view.
@@ -32,10 +33,15 @@ public class TimingActivity extends Activity {
     MediaPlayer controlBeep, startBeep;
     TextView firstnameText, lastnameText, courseText, clubText, distanceText, speed;
     ArrayList<Location> controls;
-    ArrayList<Double> controlTimes;
+    ArrayList<Integer> controlTimes;
     Double travelledDistance;
-    String course;
+    String course, uuid;
     String[] runner;
+    Boolean timing;
+
+    // Dummy data
+
+    Integer cid, cnum;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +49,12 @@ public class TimingActivity extends Activity {
         runner = getIntent().getStringArrayExtra("Runner");
 
         course = "LongaNatten";
+
+        cid = 1;
+        cnum = 1;
+        timing = false;
+        uuid = UUID.randomUUID().toString();
+
 
         chronometer = (Chronometer) findViewById(R.id.chronometer);
         startButton = (Button) findViewById(R.id.startbutton);
@@ -66,35 +78,35 @@ public class TimingActivity extends Activity {
         controls = new ArrayList<>();
         controlTimes = new ArrayList<>();
         Location control = new Location("2");
-        control.setLatitude(60.166775);
-        control.setLongitude(24.798710);
+        control.setLatitude(60.167153);
+        control.setLongitude(24.797313);
         Location control2 = new Location("2");
-        control2.setLatitude(60.163148);
-        control2.setLongitude(24.806030);
+        control2.setLatitude(60.167024);
+        control2.setLongitude(24.798407);
         Location control3 = new Location("2");
-        control3.setLatitude(60.160324);
-        control3.setLongitude(24.802151);
+        control3.setLatitude(60.167236);
+        control3.setLongitude(24.798479);
         Location control4 = new Location("2");
-        control4.setLatitude(60.159624);
-        control4.setLongitude(24.794984);
-        Location control5 = new Location("2");
-        control5.setLatitude(60.162700);
-        control5.setLongitude(24.793379);
-        Location control6 = new Location("2");
-        control6.setLatitude(60.165137);
-        control6.setLongitude(24.792941);
-        Location control7 = new Location("2");
-        control7.setLatitude(60.167450);
-        control7.setLongitude(24.797156);
-
-
+        control4.setLatitude(60.167485);
+        control4.setLongitude(24.797647);
+//        Location control5 = new Location("2");
+//        control5.setLatitude(60.162700);
+//        control5.setLongitude(24.793379);
+//        Location control6 = new Location("2");
+//        control6.setLatitude(60.165137);
+//        control6.setLongitude(24.792941);
+//        Location control7 = new Location("2");
+//        control7.setLatitude(60.167450);
+//        control7.setLongitude(24.797156);
+//
+//
         controls.add(control);
         controls.add(control2);
         controls.add(control3);
         controls.add(control4);
-        controls.add(control5);
-        controls.add(control6);
-        controls.add(control7);
+//        controls.add(control5);
+//        controls.add(control6);
+//        controls.add(control7);
 
         distanceText.setText(getDistance(controls) + " km\n" + controls.size() + " Controls");
 
@@ -111,7 +123,6 @@ public class TimingActivity extends Activity {
             @Override
             public void onLocationChanged(Location location) {
                 checkControl(location, controls.get(0));
-
                 //Show speed min/km
                 speed.setText("" + String.format("%.2f", (16.666666667 / location.getSpeed())) + " min/km");
             }
@@ -150,8 +161,8 @@ public class TimingActivity extends Activity {
                     public void onFinish() {
                         chronometer.setBase(SystemClock.elapsedRealtime());
                         chronometer.start();
+                        timing = true;
                         startBeep.start();
-                        startButton.setText("Go!");
                         startButton.setVisibility(View.INVISIBLE);
 
                     }
@@ -199,29 +210,38 @@ public class TimingActivity extends Activity {
 
         //Check if GPS location is inside control radius
         if ((Math.pow((lat - cLat), 2) + Math.pow((lon - cLon), 2)) < (Math.pow(rad, 2))) {
-            //Punch control
-            Double controltime;
-            if (controlTimes.isEmpty()) {
-                controltime = (SystemClock.elapsedRealtime() - chronometer.getBase() + 0.0);
-            } else {
-                controltime = (SystemClock.elapsedRealtime() - controlTimes.get(controlTimes.size() - 1));
-            }
-            controlTimes.add(controltime);
-            //Next send controltime to the server
+
+            //Punch control if timing is running
+            int controltime = 0;
+            if (timing) {
+                if (controlTimes.isEmpty()) {
+                    controltime = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000);
+                } else {
+                    controltime = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000 - controlTimes.get(controlTimes.size() - 1));
+                }
+                controlTimes.add(controltime);
+
+                //Punching signals
+                controlBeep.start();
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(1000);
+                courseText.setText(Integer.toString(controltime));
+
+                //Next send controltime to the server
+                new controlTimingActivity(courseText).execute(Integer.toString(cid), runner[0], Integer.toString(cnum), Integer.toString(controltime),uuid);
 
 
-            //Remove punched control from controls list
-            controls.remove(0);
+                //Remove punched control from controls list
+                controls.remove(0);
+                cnum++;
 
-            //Punching signals
-            controlBeep.start();
-            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            v.vibrate(1000);
 
-            //When no controls left -> Stop Chronometer and GPS
-            if (controls.isEmpty()) {
-                chronometer.stop();
-                locationManager.removeUpdates(locationListener);
+                //When no controls left -> Stop Chronometer and GPS
+                if (controls.isEmpty()) {
+                    chronometer.stop();
+                    timing = false;
+                    locationManager.removeUpdates(locationListener);
+                }
             }
         }
     }
