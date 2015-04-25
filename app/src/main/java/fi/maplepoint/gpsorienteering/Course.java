@@ -3,25 +3,39 @@ package fi.maplepoint.gpsorienteering;
 import android.location.Location;
 
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 /**
  * Created by Jukkis on 17.4.2015.
  */
 public class Course {
-    private int id;
+    private int id, cid;
     private String name;
-    private double length;
-    private ArrayList<Location> controls = new ArrayList<>();
+    private ArrayList<Control> controls = new ArrayList<>();
 
-    public Course(Integer competitionID) {
-
-        setControls();
+    public Course(Integer id) {
+        this.id = id;
+        controls = new ArrayList<Control>();
     }
-
-    public void setControls() {
-        Location control = new Location("" + controls.size() + 1);
-        control.setLatitude(2.1);
-        control.setLongitude(2.1);
+    public void addControl(Control control) {
         controls.add(control);
+    }
+    public ArrayList<Control> getControls(){
+        return this.controls;
+    }
+    public void setCompetitionID(Integer id){
+        this.cid = id;
+    }
+    public Integer getCompetitionID(){
+        return this.cid;
+    }
+    public void setName(String name){
+        this.name = name;
+    }
+    public String getName(){
+        return this.name;
+    }
+    public int getID(){
+        return this.id;
     }
 }
