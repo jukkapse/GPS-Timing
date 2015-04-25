@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by Jukkis on 21.4.2015.
  */
-public class getCourseActivity extends AsyncTask<String, Void, List<String>> {
+public class getCourseActivity extends AsyncTask<String, Void, List<Course>> {
 
 
     private ProgressDialog dialog;
@@ -34,7 +34,7 @@ public class getCourseActivity extends AsyncTask<String, Void, List<String>> {
     }
 
     @Override
-    protected List<String> doInBackground(String... arg0) {
+    protected List<Course> doInBackground(String... arg0) {
         try {
             String id = arg0[0];
             String link = "http://outdoorathletics.fi/gps-timing/libs/load_courses.php";
@@ -51,20 +51,30 @@ public class getCourseActivity extends AsyncTask<String, Void, List<String>> {
                     (new InputStreamReader(conn.getInputStream()));
             String line;
             // Read Server Response
-            ArrayList<String[]> competitions = new ArrayList<>();
+            ArrayList<Course> competitions = new ArrayList<>();
 
-            List<String> courses = new ArrayList<String>();
+            List<Course> courses = new ArrayList<>();
+            Course course = new Course(null);
             Integer i = 0;
             while ((line = reader.readLine()) != null) {
-                courses.add(line);
+                if (i == 0) {
+                    course = new Course(Integer.parseInt(line));
+                } else if (i==1){
+                    course.setName(line);
+                } else if (i==2){
+                    course.setCompetitionID(Integer.parseInt(line));
+                }
+
+                courses.add(course);
             }
             return courses;
         } catch (Exception e) {
             return new ArrayList<>();
         }
     }
+
     @Override
-    protected void onPostExecute(List<String> competitions) {
+    protected void onPostExecute(List<Course> competitions) {
         dialog.cancel();
     }
 }

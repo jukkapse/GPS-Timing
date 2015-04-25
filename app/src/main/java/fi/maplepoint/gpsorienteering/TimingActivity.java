@@ -263,7 +263,7 @@ public class TimingActivity extends Activity {
                 courseText.setText(Integer.toString(legTime));
 
                 //Next send legTime to the server
-                new controlTimingActivity(courseText).execute(Integer.toString(cid), runner[0], Integer.toString(cnum), Integer.toString(legTime), uuid);
+                new controlTimingActivity(courseText).execute(Integer.toString(cid), runner[0], Integer.toString(cnum), Integer.toString(legTime),Integer.toString(controlTime), uuid);
 
                 //Remove punched control from controls list
                 controls.remove(0);
