@@ -34,21 +34,22 @@ public class TimingActivity extends Activity {
     TextView firstnameText, lastnameText, courseText, clubText, distanceText, speed;
     ArrayList<Location> controls;
     ArrayList<Integer> legTimes;
-    Double travelledDistance;
+    ArrayList<Double[]> courseData;
     String course, uuid;
     String[] runner;
     Boolean timing;
-
-    // Dummy data
-
     Integer cid, cnum, controlTime;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.active_view);
+
         runner = getIntent().getStringArrayExtra("Runner");
 
         course = "LongaNatten";
+
+        controls = new ArrayList<>();
+        legTimes = new ArrayList<>();
 
         cid = 1;
         cnum = 1;
@@ -56,13 +57,30 @@ public class TimingActivity extends Activity {
         controlTime = 0;
         uuid = UUID.randomUUID().toString();
 
+        //Build course
+//        courseData = getCourseActivity(cid);
+//        for (int i = 0; i < courseData.size(); i++) {
+//            Location control = new Location("");
+//            control.setLatitude(courseData.get(i)[0]);
+//            control.setLongitude(courseData.get(i)[1]);
+//            controls.add(control);
+//        }
 
+        //Chronometer
         chronometer = (Chronometer) findViewById(R.id.chronometer);
-        startButton = (Button) findViewById(R.id.startbutton);
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        controlBeep = MediaPlayer.create(TimingActivity.this, R.raw.controlbeep);
-        startBeep = MediaPlayer.create(TimingActivity.this, R.raw.startbeep);
 
+        //StartButton
+        startButton = (Button) findViewById(R.id.startbutton);
+        startButton.setVisibility(View.INVISIBLE);
+
+        //Sounds
+        startBeep = MediaPlayer.create(TimingActivity.this, R.raw.startbeep);
+        controlBeep = MediaPlayer.create(TimingActivity.this, R.raw.controlbeep);
+
+        //GPS location manager
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        //TextViews
         courseText = (TextView) findViewById(R.id.course);
         firstnameText = (TextView) findViewById(R.id.firstname);
         lastnameText = (TextView) findViewById(R.id.lastname);
@@ -74,10 +92,7 @@ public class TimingActivity extends Activity {
         firstnameText.setText(runner[1]);
         lastnameText.setText(runner[2]);
         clubText.setText(runner[3]);
-        travelledDistance = 0.0;
 
-        controls = new ArrayList<>();
-        legTimes = new ArrayList<>();
         Location control = new Location("2");
         control.setLatitude(60.167153);
         control.setLongitude(24.797313);
@@ -90,40 +105,39 @@ public class TimingActivity extends Activity {
         Location control4 = new Location("2");
         control4.setLatitude(60.167485);
         control4.setLongitude(24.797647);
-//        Location control5 = new Location("2");
-//        control5.setLatitude(60.162700);
-//        control5.setLongitude(24.793379);
-//        Location control6 = new Location("2");
-//        control6.setLatitude(60.165137);
-//        control6.setLongitude(24.792941);
-//        Location control7 = new Location("2");
-//        control7.setLatitude(60.167450);
-//        control7.setLongitude(24.797156);
-//
-//
+
         controls.add(control);
         controls.add(control2);
         controls.add(control3);
         controls.add(control4);
-//        controls.add(control5);
-//        controls.add(control6);
-//        controls.add(control7);
 
-        distanceText.setText(getDistance(controls) + " km\n" + controls.size() + " Controls");
+        //Show course distance
+        distanceText.setText(getDistance(controls) + " km\n" + (controls.size() - 1) + " Controls");
 
-
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            startButton.setVisibility(View.VISIBLE);
-
-        } else {
-            startButton.setVisibility(View.INVISIBLE);
+        //Check if GPS is enabled!
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             showGPSDisabledAlertToUser();
         }
 
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+
+                //Show GPS Accuracy
+                courseText.setText("Accuracy: " + location.getAccuracy() + "m");
+
+                //Show starting button if standing at starting place and GPS accuracy is better than 20m.
+                if (!timing && insideArea(location, controls.get(0))) {
+                    if (location.getAccuracy() > 20) {
+                        startButton.setVisibility(View.INVISIBLE);
+                    } else {
+                        startButton.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                //Check if location is inside control area
                 checkControl(location, controls.get(0));
+
                 //Show speed min/km
                 speed.setText("" + String.format("%.2f", (16.666666667 / location.getSpeed())) + " min/km");
             }
@@ -142,21 +156,30 @@ public class TimingActivity extends Activity {
             public void onProviderDisabled(String provider) {
             }
         };
+
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //Remove starting point
+                controls.remove(0);
+
+                //Disable StartButton
                 startButton.setEnabled(false);
+
+                //Stop BackgroundMusic
                 MainActivity.stopBackgroundMusic();
+
+                //Start CounDownTimer (10s)
                 new CountDownTimer(10000, 1000) {
                     public void onTick(long millisUntilFinished) {
                         if (millisUntilFinished / 1000 <= 5) {
                             controlBeep.start();
                         }
                         startButton.setText("" + millisUntilFinished / 1000);
-
                     }
 
                     public void onFinish() {
@@ -165,11 +188,31 @@ public class TimingActivity extends Activity {
                         timing = true;
                         startBeep.start();
                         startButton.setVisibility(View.INVISIBLE);
-
                     }
                 }.start();
             }
         });
+    }
+
+    //Check if current position is inside control area
+    private boolean insideArea(Location gps, Location control) {
+        //Get GPS latitude and longnitude
+        Double lat = gps.getLatitude();
+        Double lon = gps.getLongitude();
+
+        //Get control latitude and longnitude
+        Double cLat = control.getLatitude();
+        Double cLon = control.getLongitude();
+
+        //Radius around control where "punching" is allowed + GPS Accuracy!
+        Double rad = 0.00005
+                + (gps.getAccuracy() * Math.pow(10, -5));
+
+        if ((Math.pow((lat - cLat), 2) + Math.pow((lon - cLon), 2)) < (Math.pow(rad, 2))) {
+            return true;
+        } else {
+            return false;
+        }
 
     }
 
@@ -196,21 +239,11 @@ public class TimingActivity extends Activity {
         alert.show();
     }
 
+    //Punch control if location is inside control area
     public void checkControl(Location gps, Location control) {
-        //Get GPS latitude and longnitude
-        Double lat = gps.getLatitude();
-        Double lon = gps.getLongitude();
 
-        //Get control latitude and longnitude
-        Double cLat = control.getLatitude();
-        Double cLon = control.getLongitude();
-
-        //Radius around control where "punching" is allowed + GPS Accuracy!
-        Double rad = 0.00010;
-//                + (gps.getAccuracy() * Math.pow(10, -7));
-
-        //Check if GPS location is inside control radius
-        if ((Math.pow((lat - cLat), 2) + Math.pow((lon - cLon), 2)) < (Math.pow(rad, 2))) {
+        //Check if GPS location is insideArea control radius
+        if (insideArea(gps, control)) {
 
             //Punch control if timing is running
             int legTime = 0;
@@ -230,13 +263,11 @@ public class TimingActivity extends Activity {
                 courseText.setText(Integer.toString(legTime));
 
                 //Next send legTime to the server
-                new controlTimingActivity(courseText).execute(Integer.toString(cid), runner[0], Integer.toString(cnum), Integer.toString(legTime),uuid);
-
+                new controlTimingActivity(courseText).execute(Integer.toString(cid), runner[0], Integer.toString(cnum), Integer.toString(legTime), uuid);
 
                 //Remove punched control from controls list
                 controls.remove(0);
                 cnum++;
-
 
                 //When no controls left -> Stop Chronometer and GPS
                 if (controls.isEmpty()) {

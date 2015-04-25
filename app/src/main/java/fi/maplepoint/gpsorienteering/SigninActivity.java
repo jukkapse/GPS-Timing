@@ -1,5 +1,6 @@
 package fi.maplepoint.gpsorienteering;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -19,6 +20,7 @@ import java.net.URLEncoder;
 
 
 public class SigninActivity extends AsyncTask<String, Void, String[]> {
+    private ProgressDialog dialog;
 
     private TextView statusField;
     private Context context;
@@ -30,8 +32,10 @@ public class SigninActivity extends AsyncTask<String, Void, String[]> {
     }
 
     protected void onPreExecute() {
-        statusField.setVisibility(View.VISIBLE);
-        statusField.setText("Loading data...");
+        dialog = new ProgressDialog(context);
+        dialog.setCancelable(true);
+        dialog.setMessage("Loading data...");
+        dialog.show();
     }
 
     @Override
@@ -69,10 +73,12 @@ public class SigninActivity extends AsyncTask<String, Void, String[]> {
 
     @Override
     protected void onPostExecute(String[] result) {
+        dialog.cancel();
         if (result[0] != null) {
-      //      Intent i = new Intent(context, selectCourseActivity.class);
-            Intent i = new Intent(context, TimingActivity.class);
-            i.putExtra("Runner", result);
+            Intent i = new Intent(context, selectCourseActivity.class);
+//            i.putExtra("Competitions", competitions);
+//            Intent i = new Intent(context, TimingActivity.class);
+//            i.putExtra("Runner", result);
             context.startActivity(i);
         } else {
             statusField.setText("Invalid username or password!");

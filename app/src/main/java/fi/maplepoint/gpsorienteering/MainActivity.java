@@ -87,6 +87,7 @@ public class MainActivity extends Activity {
         status.setText("");
     }
 
+
     public static void stopBackgroundMusic() {
         mediaPlayer.release();
     }
