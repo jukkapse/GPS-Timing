@@ -13,8 +13,8 @@ public class Course {
     private String name, length;
     private ArrayList<Control> controls = new ArrayList<>();
 
-    public Course(Integer id) {
-        this.id = id;
+    public Course(String id) {
+        this.id = Integer.parseInt(id);
         controls = new ArrayList<Control>();
     }
     public void addControls(ArrayList<Control> controls) {
@@ -24,8 +24,8 @@ public class Course {
         return this.controls;
     }
 
-    public void setCompetitionID(Integer id){
-        this.cid = id;
+    public void setCompetitionID(String id){
+        this.cid = Integer.parseInt(id);
     }
     public Integer getCompetitionID(){
         return this.cid;

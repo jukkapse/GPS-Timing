@@ -18,7 +18,6 @@ import java.util.ArrayList;
  */
 public class getCompetitionActivity extends AsyncTask<String, Void, ArrayList<Competition>> {
 
-    private ProgressDialog dialog;
     private Context context;
 
     public getCompetitionActivity(Context context) {
@@ -26,10 +25,6 @@ public class getCompetitionActivity extends AsyncTask<String, Void, ArrayList<Co
     }
 
     protected void onPreExecute() {
-        dialog = new ProgressDialog(context);
-        dialog.setCancelable(true);
-        dialog.setMessage("Loading events...");
-        dialog.show();
     }
 
     @Override
@@ -83,6 +78,5 @@ public class getCompetitionActivity extends AsyncTask<String, Void, ArrayList<Co
     }
     @Override
     protected void onPostExecute(ArrayList<Competition> competitions) {
-        dialog.cancel();
     }
 }

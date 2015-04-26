@@ -16,6 +16,7 @@ public class Competition {
 
     public Competition(Integer id) {
         this.id = id;
+        this.start = new Location("");
     }
     public Integer getID(){
         return this.id;
@@ -43,7 +44,6 @@ public class Competition {
     }
 
     public void setStart(String lat, String lon) {
-        Location start = new Location("");
         start.setLatitude(Double.parseDouble(lat));
         start.setLongitude(Double.parseDouble(lon));
     }

@@ -52,7 +52,6 @@ public class selectCourseActivity extends Activity {
             @Override
             public void onLocationChanged(Location location) {
                 if (location.getAccuracy() < 70) {
-                    waitingGPS.cancel();
                     try {
                         competitions = new getCompetitionActivity(context).execute(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude())).get();
                     } catch (InterruptedException e) {
@@ -60,10 +59,12 @@ public class selectCourseActivity extends Activity {
                     } catch (ExecutionException e) {
                         e.printStackTrace();
                     }
+
                     locationFix = true;
+                    //getCourses(competitions);
                     locationManager.removeUpdates(locationListener);
 
-
+                    waitingGPS.setMessage("Loading events...");
                     for (int i = 0; i < competitions.size(); i++) {
                         try {
                             competitions.get(i).addCourses(new getCourseActivity(context).execute(Integer.toString(competitions.get(i).getID())).get());
@@ -73,7 +74,7 @@ public class selectCourseActivity extends Activity {
                             e.printStackTrace();
                         }
                     }
-
+                    waitingGPS.cancel();
                     if (locationFix) {
                         expListView = (ExpandableListView) findViewById(R.id.expandableListView);
 
@@ -171,7 +172,7 @@ public class selectCourseActivity extends Activity {
         listDataChild = new HashMap<>();
 
         // Adding child data
-        List<String> courses = new ArrayList<>();
+        List<String> courses;
         for (int i = 0; i < competitions.size(); i++) {
             try {
                 competitions.get(i).addCourses(new getCourseActivity(context).execute(Integer.toString(competitions.get(i).getID())).get());
@@ -181,8 +182,8 @@ public class selectCourseActivity extends Activity {
                 e.printStackTrace();
             }
             listDataHeader.add(competitions.get(i).getName());
+            courses = new ArrayList<>();
             for (int j = 0; j < competitions.get(i).getCourses().size(); j++) {
-                courses = new ArrayList<>();
                 courses.add(competitions.get(i).getCourses().get(j).getName());
             }
             listDataChild.put(listDataHeader.get(i), courses);

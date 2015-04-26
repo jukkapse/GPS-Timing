@@ -19,7 +19,6 @@ import java.util.List;
 public class getCourseActivity extends AsyncTask<String, Void, ArrayList<Course>> {
 
 
-    private ProgressDialog dialog;
     private Context context;
 
     public getCourseActivity(Context context) {
@@ -27,10 +26,6 @@ public class getCourseActivity extends AsyncTask<String, Void, ArrayList<Course>
     }
 
     protected void onPreExecute() {
-        dialog = new ProgressDialog(context);
-        dialog.setCancelable(true);
-        dialog.setMessage("Loading courses...");
-        dialog.show();
     }
 
     @Override
@@ -51,17 +46,16 @@ public class getCourseActivity extends AsyncTask<String, Void, ArrayList<Course>
                     (new InputStreamReader(conn.getInputStream()));
             String line;
             // Read Server Response
-
             ArrayList<Course> courses = new ArrayList<>();
-            Course course = new Course(null);
+            Course course = new Course("999");
             Integer i = 0;
             while ((line = reader.readLine()) != null) {
                 if (i == 0) {
-                    course = new Course(Integer.parseInt(line));
+                    course = new Course(line);
                 } else if (i == 1) {
                     course.setName(line);
                 } else if (i == 2) {
-                    course.setCompetitionID(Integer.parseInt(line));
+                    course.setCompetitionID(line);
                 } else {
                     course.setLength(line);
                     courses.add(course);
@@ -77,6 +71,5 @@ public class getCourseActivity extends AsyncTask<String, Void, ArrayList<Course>
 
     @Override
     protected void onPostExecute(ArrayList<Course> competitions) {
-        dialog.cancel();
     }
 }
