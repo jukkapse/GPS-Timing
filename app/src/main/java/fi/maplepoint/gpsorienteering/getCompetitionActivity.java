@@ -16,7 +16,7 @@ import java.util.ArrayList;
 /**
  * Created by Jukkis on 21.4.2015.
  */
-public class getCompetitionActivity extends AsyncTask<String, Void, ArrayList<String[]>> {
+public class getCompetitionActivity extends AsyncTask<String, Void, ArrayList<Competition>> {
 
     private ProgressDialog dialog;
     private Context context;
@@ -33,7 +33,7 @@ public class getCompetitionActivity extends AsyncTask<String, Void, ArrayList<St
     }
 
     @Override
-    protected ArrayList<String[]> doInBackground(String... arg0) {
+    protected ArrayList<Competition> doInBackground(String... arg0) {
         try {
             String lat = arg0[0];
             String lon = arg0[1];
@@ -53,17 +53,26 @@ public class getCompetitionActivity extends AsyncTask<String, Void, ArrayList<St
                     (new InputStreamReader(conn.getInputStream()));
             String line;
             // Read Server Response
-            ArrayList<String[]> competitions = new ArrayList<>();
+            ArrayList<Competition> competitions = new ArrayList<>();
+            String latitude = "";
+            String longnitude = "";
 
-            String[] competition = new String[10];
-            // competitions.add(competition);
+            Competition competition = new Competition(null);
             Integer i = 0;
             while ((line = reader.readLine()) != null) {
-                competition[i] = line;
-                if (i % 2 == 0 && i != 0) {
+                if(i==0){
+                    competition = new Competition(Integer.parseInt(line));
+                }else if(i==1){
+                    competition.setName(line);
+                } else if (i==2) {
+                    latitude = line;
+                } else if (i==3){
+                    longnitude = line;
+                    competition.setStart(latitude, longnitude);
+                }else {
+                    competition.setLocation(line);
                     competitions.add(competition);
-                    competition = new String[10];
-                    i=-1;
+                    i = -1;
                 }
                 i++;
             }
@@ -73,7 +82,7 @@ public class getCompetitionActivity extends AsyncTask<String, Void, ArrayList<St
         }
     }
     @Override
-    protected void onPostExecute(ArrayList<String[]> competitions) {
+    protected void onPostExecute(ArrayList<Competition> competitions) {
         dialog.cancel();
     }
 }

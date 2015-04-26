@@ -57,15 +57,6 @@ public class TimingActivity extends Activity {
         controlTime = 0;
         uuid = UUID.randomUUID().toString();
 
-        //Build course
-//        courseData = getCourseActivity(cid);
-//        for (int i = 0; i < courseData.size(); i++) {
-//            Location control = new Location("");
-//            control.setLatitude(courseData.get(i)[0]);
-//            control.setLongitude(courseData.get(i)[1]);
-//            controls.add(control);
-//        }
-
         //Chronometer
         chronometer = (Chronometer) findViewById(R.id.chronometer);
 
@@ -93,23 +84,25 @@ public class TimingActivity extends Activity {
         lastnameText.setText(runner[2]);
         clubText.setText(runner[3]);
 
-        Location control = new Location("2");
-        control.setLatitude(60.167153);
-        control.setLongitude(24.797313);
-        Location control2 = new Location("2");
-        control2.setLatitude(60.167024);
-        control2.setLongitude(24.798407);
-        Location control3 = new Location("2");
-        control3.setLatitude(60.167236);
-        control3.setLongitude(24.798479);
-        Location control4 = new Location("2");
-        control4.setLatitude(60.167485);
-        control4.setLongitude(24.797647);
+//        controls = getControlsActivity().get();
 
-        controls.add(control);
-        controls.add(control2);
-        controls.add(control3);
-        controls.add(control4);
+//        Location control = new Location("2");
+//        control.setLatitude(60.167153);
+//        control.setLongitude(24.797313);
+//        Location control2 = new Location("2");
+//        control2.setLatitude(60.167024);
+//        control2.setLongitude(24.798407);
+//        Location control3 = new Location("2");
+//        control3.setLatitude(60.167236);
+//        control3.setLongitude(24.798479);
+//        Location control4 = new Location("2");
+//        control4.setLatitude(60.167485);
+//        control4.setLongitude(24.797647);
+//
+//        controls.add(control);
+//        controls.add(control2);
+//        controls.add(control3);
+//        controls.add(control4);
 
         //Show course distance
         distanceText.setText(getDistance(controls) + " km\n" + (controls.size() - 1) + " Controls");
