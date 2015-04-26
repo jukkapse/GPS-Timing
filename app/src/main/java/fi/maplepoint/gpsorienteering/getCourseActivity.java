@@ -58,12 +58,16 @@ public class getCourseActivity extends AsyncTask<String, Void, ArrayList<Course>
             while ((line = reader.readLine()) != null) {
                 if (i == 0) {
                     course = new Course(Integer.parseInt(line));
-                } else if (i==1){
+                } else if (i == 1) {
                     course.setName(line);
-                } else if (i==2){
+                } else if (i == 2) {
                     course.setCompetitionID(Integer.parseInt(line));
+                } else {
+                    course.setLength(line);
+                    courses.add(course);
+                    i = -1;
                 }
-                courses.add(course);
+                i++;
             }
             return courses;
         } catch (Exception e) {

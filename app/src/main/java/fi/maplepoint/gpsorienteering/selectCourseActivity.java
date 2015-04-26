@@ -31,7 +31,7 @@ public class selectCourseActivity extends Activity {
     LocationListener locationListener;
     public ArrayList<Competition> competitions;
     boolean locationFix = false;
-    private ProgressDialog dialog;
+    private ProgressDialog waitingGPS;
     Context context;
 
     @Override
@@ -40,10 +40,11 @@ public class selectCourseActivity extends Activity {
         setContentView(R.layout.select_course);
         context = this;
 
-        dialog = new ProgressDialog(this);
-        dialog.setCancelable(true);
-        dialog.setMessage("Waiting for GPS-signal...");
-        dialog.show();
+        waitingGPS = new ProgressDialog(this);
+        waitingGPS.setCancelable(true);
+        waitingGPS.setMessage("Waiting for GPS-signal...");
+        waitingGPS.show();
+
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -51,7 +52,7 @@ public class selectCourseActivity extends Activity {
             @Override
             public void onLocationChanged(Location location) {
                 if (location.getAccuracy() < 70) {
-                    dialog.cancel();
+                    waitingGPS.cancel();
                     try {
                         competitions = new getCompetitionActivity(context).execute(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude())).get();
                     } catch (InterruptedException e) {
@@ -166,30 +167,31 @@ public class selectCourseActivity extends Activity {
      * Preparing the list data
      */
     private void prepareListData() {
-        listDataHeader = new ArrayList<String>();
-        listDataChild = new HashMap<String, List<String>>();
+        listDataHeader = new ArrayList<>();
+        listDataChild = new HashMap<>();
 
         // Adding child data
+        List<String> courses = new ArrayList<>();
         for (int i = 0; i < competitions.size(); i++) {
+            try {
+                competitions.get(i).addCourses(new getCourseActivity(context).execute(Integer.toString(competitions.get(i).getID())).get());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
             listDataHeader.add(competitions.get(i).getName());
-//            List<Course> courses = null;
-//            try {
-//                courses = new getCourseActivity(context).execute(competitions.get(i)[0]).get();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            } catch (ExecutionException e) {
-//                e.printStackTrace();
-//            }
-//            for (int j = 0; j < competitions.get(i).length-1; j++) {
-//               // courses.add(courses);
-//            }
-//            listDataChild.put(listDataHeader.get(i), courses);
+            for (int j = 0; j < competitions.get(i).getCourses().size(); j++) {
+                courses = new ArrayList<>();
+                courses.add(competitions.get(i).getCourses().get(j).getName());
+            }
+            listDataChild.put(listDataHeader.get(i), courses);
         }
 
 
         // Adding child data
-        List<String> top250 = new ArrayList<String>();
-        top250.add("The Shawshank Redemption");
+//        List<String> top250 = new ArrayList<String>();
+//        top250.add("The Shawshank Redemption");
 //        top250.add("The Godfather");
 ////        top250.add("The Godfather: Part II");
 ////        top250.add("Pulp Fiction");
@@ -209,7 +211,7 @@ public class selectCourseActivity extends Activity {
 //        comingSoon.add("Pitkämatka 12,2 km / 13 rastia");
 //        comingSoon.add("Keskimatka 2,2 km / 20 rastia");
 ////
-       listDataChild.put(listDataHeader.get(0), top250); // Header, Child data
+//       listDataChild.put(listDataHeader.get(0), top250); // Header, Child data
 //        listDataChild.put(listDataHeader.get(1), nowShowing);
 //        listDataChild.put(listDataHeader.get(2), comingSoon);
     }
