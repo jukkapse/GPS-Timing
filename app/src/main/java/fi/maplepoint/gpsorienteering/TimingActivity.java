@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Timing activity takes care of active_view.
@@ -32,27 +33,43 @@ public class TimingActivity extends Activity {
     LocationListener locationListener;
     MediaPlayer controlBeep, startBeep;
     TextView firstnameText, lastnameText, courseText, clubText, distanceText, speed;
-    ArrayList<Location> controls;
     ArrayList<Integer> legTimes;
-    ArrayList<Double[]> courseData;
-    String course, uuid;
-    String[] runner;
+
+  //  ArrayList<Double[]> courseData;
+    String compName, course, uuid;
+    Runner runner;
+    ArrayList<Control> controls;
     Boolean timing;
-    Integer cid, cnum, controlTime;
+    Integer courseID, controlNumber, controlTime;
+    Context context;
+
+//    public TimingActivity(Context context, Integer courseID, String courseText, String compName ,Runner runner){
+//        this.context = context;
+//        this.courseID = courseID;
+//        this.course = courseText;
+//        this.compName = compName;
+//        this.runner = runner;
+//    }
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.active_view);
 
-        runner = getIntent().getStringArrayExtra("Runner");
+        this.courseID = Integer.parseInt(getIntent().getStringExtra("courseID"));
+        this.course = getIntent().getStringExtra("courseText");
+        this.compName = getIntent().getStringExtra("compName");
+        this.runner = (Runner) getIntent().getSerializableExtra("runner");
 
-        course = "LongaNatten";
-
-        controls = new ArrayList<>();
+        try {
+            controls = new getControlsActivity(context).execute(Integer.toString(courseID)).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
         legTimes = new ArrayList<>();
-
-        cid = 1;
-        cnum = 1;
+        
+        controlNumber = 1;
         timing = false;
         controlTime = 0;
         uuid = UUID.randomUUID().toString();
@@ -80,32 +97,12 @@ public class TimingActivity extends Activity {
         speed = (TextView) findViewById(R.id.speed);
 
         courseText.setText(course);
-        firstnameText.setText(runner[1]);
-        lastnameText.setText(runner[2]);
-        clubText.setText(runner[3]);
-
-//        controls = getControlsActivity().get();
-
-//        Location control = new Location("2");
-//        control.setLatitude(60.167153);
-//        control.setLongitude(24.797313);
-//        Location control2 = new Location("2");
-//        control2.setLatitude(60.167024);
-//        control2.setLongitude(24.798407);
-//        Location control3 = new Location("2");
-//        control3.setLatitude(60.167236);
-//        control3.setLongitude(24.798479);
-//        Location control4 = new Location("2");
-//        control4.setLatitude(60.167485);
-//        control4.setLongitude(24.797647);
-//
-//        controls.add(control);
-//        controls.add(control2);
-//        controls.add(control3);
-//        controls.add(control4);
-
+        firstnameText.setText(runner.getFirstname());
+        lastnameText.setText(runner.getLastname());
+        clubText.setText(runner.getClub());
+        distanceText.setText(compName);
         //Show course distance
-        distanceText.setText(getDistance(controls) + " km\n" + (controls.size() - 1) + " Controls");
+        //distanceText.setText(getDistance(controls) + " km\n" + (controls.size() - 1) + " Controls");
 
         //Check if GPS is enabled!
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -117,10 +114,10 @@ public class TimingActivity extends Activity {
             public void onLocationChanged(Location location) {
 
                 //Show GPS Accuracy
-                courseText.setText("Accuracy: " + location.getAccuracy() + "m");
+           //     courseText.setText("Accuracy: " + location.getAccuracy() + "m");
 
                 //Show starting button if standing at starting place and GPS accuracy is better than 20m.
-                if (!timing && insideArea(location, controls.get(0))) {
+                if (!timing && insideArea(location, controls.get(0).getLocation())) {
                     if (location.getAccuracy() > 20) {
                         startButton.setVisibility(View.INVISIBLE);
                     } else {
@@ -129,7 +126,7 @@ public class TimingActivity extends Activity {
                 }
 
                 //Check if location is inside control area
-                checkControl(location, controls.get(0));
+                checkControl(location, controls.get(0).getLocation());
 
                 //Show speed min/km
                 speed.setText("" + String.format("%.2f", (16.666666667 / location.getSpeed())) + " min/km");
@@ -256,11 +253,11 @@ public class TimingActivity extends Activity {
                 courseText.setText(Integer.toString(legTime));
 
                 //Next send legTime to the server
-                new controlTimingActivity(courseText).execute(Integer.toString(cid), runner[0], Integer.toString(cnum), Integer.toString(legTime),Integer.toString(controlTime), uuid);
+                new controlTimingActivity(courseText).execute(Integer.toString(courseID), runner.getID(), Integer.toString(controlNumber), Integer.toString(legTime),Integer.toString(controlTime), uuid);
 
                 //Remove punched control from controls list
                 controls.remove(0);
-                cnum++;
+                controlNumber++;
 
                 //When no controls left -> Stop Chronometer and GPS
                 if (controls.isEmpty()) {

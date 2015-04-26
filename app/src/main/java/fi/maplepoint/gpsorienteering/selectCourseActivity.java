@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -26,12 +27,13 @@ public class selectCourseActivity extends Activity {
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
     static List<String> listDataHeader;
-    static HashMap<String, List<String>> listDataChild;
+    static HashMap<String, ArrayList<Course>> listDataChild;
     LocationManager locationManager;
     LocationListener locationListener;
     public ArrayList<Competition> competitions;
     boolean locationFix = false;
     private ProgressDialog waitingGPS;
+    private String[] runnerData;
     Context context;
 
     @Override
@@ -39,6 +41,9 @@ public class selectCourseActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_course);
         context = this;
+
+        runnerData = getIntent().getStringArrayExtra("Runner");
+        final Runner runner = new Runner(runnerData[0], runnerData[1], runnerData[2], runnerData[3]);
 
         waitingGPS = new ProgressDialog(this);
         waitingGPS.setCancelable(true);
@@ -61,10 +66,9 @@ public class selectCourseActivity extends Activity {
                     }
 
                     locationFix = true;
-                    //getCourses(competitions);
-                    locationManager.removeUpdates(locationListener);
+                    waitingGPS.cancel();
 
-                    waitingGPS.setMessage("Loading events...");
+                    locationManager.removeUpdates(locationListener);
                     for (int i = 0; i < competitions.size(); i++) {
                         try {
                             competitions.get(i).addCourses(new getCourseActivity(context).execute(Integer.toString(competitions.get(i).getID())).get());
@@ -74,7 +78,6 @@ public class selectCourseActivity extends Activity {
                             e.printStackTrace();
                         }
                     }
-                    waitingGPS.cancel();
                     if (locationFix) {
                         expListView = (ExpandableListView) findViewById(R.id.expandableListView);
 
@@ -86,56 +89,23 @@ public class selectCourseActivity extends Activity {
                         // setting list adapter
                         expListView.setAdapter(listAdapter);
 
-                        // Listview Group click listener
-                        expListView.setOnGroupClickListener(new OnGroupClickListener() {
-
-                            @Override
-                            public boolean onGroupClick(ExpandableListView parent, View v,
-                                                        int groupPosition, long id) {
-                                // Toast.makeText(getApplicationContext(),
-                                // "Group Clicked " + listDataHeader.get(groupPosition),
-                                // Toast.LENGTH_SHORT).show();
-                                return false;
-                            }
-                        });
-
-                        // Listview Group expanded listener
-                        expListView.setOnGroupExpandListener(new OnGroupExpandListener() {
-
-                            @Override
-                            public void onGroupExpand(int groupPosition) {
-                                Toast.makeText(getApplicationContext(),
-                                        listDataHeader.get(groupPosition) + " Expanded",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        // Listview Group collasped listener
-                        expListView.setOnGroupCollapseListener(new OnGroupCollapseListener() {
-
-                            @Override
-                            public void onGroupCollapse(int groupPosition) {
-                                Toast.makeText(getApplicationContext(),
-                                        listDataHeader.get(groupPosition) + " Collapsed",
-                                        Toast.LENGTH_SHORT).show();
-
-                            }
-                        });
-
                         // Listview on child click listener
                         expListView.setOnChildClickListener(new OnChildClickListener() {
 
                             @Override
                             public boolean onChildClick(ExpandableListView parent, View v,
                                                         int groupPosition, int childPosition, long id) {
-                                Toast.makeText(
-                                        getApplicationContext(),
-                                        listDataHeader.get(groupPosition)
-                                                + " : "
-                                                + listDataChild.get(
-                                                listDataHeader.get(groupPosition)).get(
-                                                childPosition), Toast.LENGTH_SHORT)
-                                        .show();
+                                Intent i = new Intent(context, TimingActivity.class);
+                                i.putExtra("courseID",Integer.toString(listDataChild.get(
+                                        listDataHeader.get(groupPosition)).get(
+                                        childPosition).getID()));
+                                i.putExtra("courseText", listDataChild.get(
+                                        listDataHeader.get(groupPosition)).get(
+                                        childPosition).getText());
+                                i.putExtra("compName", listDataHeader.get(groupPosition));
+                                i.putExtra("runner", runner);
+                                startActivity(i);
+
                                 return false;
                             }
                         });
@@ -161,7 +131,6 @@ public class selectCourseActivity extends Activity {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         // get the listview
-
     }
 
     /*
@@ -172,7 +141,7 @@ public class selectCourseActivity extends Activity {
         listDataChild = new HashMap<>();
 
         // Adding child data
-        List<String> courses;
+        ArrayList<Course> courses;
         for (int i = 0; i < competitions.size(); i++) {
             try {
                 competitions.get(i).addCourses(new getCourseActivity(context).execute(Integer.toString(competitions.get(i).getID())).get());
@@ -182,38 +151,7 @@ public class selectCourseActivity extends Activity {
                 e.printStackTrace();
             }
             listDataHeader.add(competitions.get(i).getName());
-            courses = new ArrayList<>();
-            for (int j = 0; j < competitions.get(i).getCourses().size(); j++) {
-                courses.add(competitions.get(i).getCourses().get(j).getName());
-            }
-            listDataChild.put(listDataHeader.get(i), courses);
+            listDataChild.put(listDataHeader.get(i), competitions.get(i).getCourses());
         }
-
-
-        // Adding child data
-//        List<String> top250 = new ArrayList<String>();
-//        top250.add("The Shawshank Redemption");
-//        top250.add("The Godfather");
-////        top250.add("The Godfather: Part II");
-////        top250.add("Pulp Fiction");
-////        top250.add("The Good, the Bad and the Ugly");
-////        top250.add("The Dark Knight");
-////        top250.add("12 Angry Men");
-////
-//        List<String> nowShowing = new ArrayList<String>();
-//        nowShowing.add("The Conjuring");
-////        nowShowing.add("Despicable Me 2");
-////        nowShowing.add("Turbo");
-////        nowShowing.add("Grown Ups 2");
-////        nowShowing.add("Red 2");
-////        nowShowing.add("The Wolverine");
-//
-//        List<String> comingSoon = new ArrayList<String>();
-//        comingSoon.add("Pitkämatka 12,2 km / 13 rastia");
-//        comingSoon.add("Keskimatka 2,2 km / 20 rastia");
-////
-//       listDataChild.put(listDataHeader.get(0), top250); // Header, Child data
-//        listDataChild.put(listDataHeader.get(1), nowShowing);
-//        listDataChild.put(listDataHeader.get(2), comingSoon);
     }
 }

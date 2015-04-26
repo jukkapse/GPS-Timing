@@ -76,9 +76,7 @@ public class SigninActivity extends AsyncTask<String, Void, String[]> {
         dialog.cancel();
         if (result[0] != null) {
             Intent i = new Intent(context, selectCourseActivity.class);
-//            i.putExtra("Competitions", competitions);
-//            Intent i = new Intent(context, TimingActivity.class);
-//            i.putExtra("Runner", result);
+            i.putExtra("Runner", result);
             context.startActivity(i);
         } else {
             statusField.setText("Invalid username or password!");

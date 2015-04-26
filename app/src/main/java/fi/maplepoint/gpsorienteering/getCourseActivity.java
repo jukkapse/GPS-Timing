@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,11 +66,13 @@ public class getCourseActivity extends AsyncTask<String, Void, ArrayList<Course>
             }
             return courses;
         } catch (Exception e) {
+            System.out.println("Virhe!: e");
             return new ArrayList<>();
         }
     }
 
     @Override
     protected void onPostExecute(ArrayList<Course> competitions) {
+
     }
 }

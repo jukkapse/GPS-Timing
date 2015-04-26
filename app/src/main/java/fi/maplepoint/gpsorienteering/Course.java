@@ -48,4 +48,8 @@ public class Course {
     public String getLength(){
         return this.length;
     }
+
+    public String getText(){
+        return this.name + " " + length + "km";
+    }
 }
