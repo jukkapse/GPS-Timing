@@ -9,7 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
+import android.location.Location;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +25,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private List<String> _listDataHeader; // header titles
     // child data in format of header title, child title
     private HashMap<String, ArrayList<Course>> _listDataChild;
+    private ArrayList<Location> locations;
 
     public ExpandableListAdapter(Context context, List<String> listDataHeader,
-                                 HashMap<String, ArrayList<Course>> listChildData) {
+                                 HashMap<String, ArrayList<Course>> listChildData, ArrayList<Location> locations) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
+        this.locations = locations;
     }
 
     @Override
@@ -55,7 +60,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         TextView txtListChild = (TextView) convertView
                 .findViewById(R.id.lblListItem);
-
         txtListChild.setText(childText);
         return convertView;
     }
@@ -82,7 +86,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getGroupView(int groupPosition, boolean isExpanded,
+    public View getGroupView(final int groupPosition, boolean isExpanded,
                              View convertView, ViewGroup parent) {
         String headerTitle = (String) getGroup(groupPosition);
         if (convertView == null) {
@@ -96,7 +100,26 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(headerTitle);
 
+        final TextView locationButton = (TextView)convertView.findViewById(R.id.locationButton);
+        locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String latitude = String.valueOf(getLocation(groupPosition).getLatitude());
+                String longnitude = String.valueOf(getLocation(groupPosition).getLongitude());
+
+
+                Uri uri =Uri.parse("http://maps.google.com/maps?q=" + latitude + "," + longnitude);
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                _context.startActivity(intent);
+             //   locationButton.setText("Position: " + _listDataHeader.get(groupPosition));
+            }
+        });
+
         return convertView;
+    }
+
+    private Location getLocation(int groupPosition) {
+        return locations.get(groupPosition);
     }
 
     @Override
@@ -108,4 +131,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
     }
+
+
 }

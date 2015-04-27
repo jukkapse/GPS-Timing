@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -35,21 +36,13 @@ public class TimingActivity extends Activity {
     TextView firstnameText, lastnameText, courseText, clubText, eventText, speed, startingDist, headingControl;
     ArrayList<Integer> legTimes;
 
-    //  ArrayList<Double[]> courseData;
     String compName, course, uuid;
     Runner runner;
     ArrayList<Control> controls;
     Boolean timing;
-    Integer courseID, controlNumber, controlTime;
+    Integer courseID, controlNumber, totalControls, controlTime;
     Context context;
 
-//    public TimingActivity(Context context, Integer courseID, String courseText, String compName ,Runner runner){
-//        this.context = context;
-//        this.courseID = courseID;
-//        this.course = courseText;
-//        this.compName = compName;
-//        this.runner = runner;
-//    }
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +61,7 @@ public class TimingActivity extends Activity {
             e.printStackTrace();
         }
         legTimes = new ArrayList<>();
-
+        totalControls = controls.size();
         controlNumber = 1;
         timing = false;
         controlTime = 0;
@@ -123,7 +116,7 @@ public class TimingActivity extends Activity {
                         startingDist.setVisibility(View.VISIBLE);
                     } else {
                         startButton.setVisibility(View.VISIBLE);
-                        startingDist.setVisibility(View.VISIBLE);
+                        startingDist.setVisibility(View.INVISIBLE);
                     }
                 }
 
@@ -132,6 +125,9 @@ public class TimingActivity extends Activity {
 
                 //Show speed min/km
                 speed.setText("Current speed: " + String.format("%.2f", (16.666666667 / location.getSpeed())) + " min/km");
+
+                //Show controls left
+                headingControl.setText("Heading control: " + controlNumber + "/" + totalControls);
             }
 
             @Override
@@ -155,8 +151,6 @@ public class TimingActivity extends Activity {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                headingControl.setVisibility(View.VISIBLE);
-                speed.setVisibility(View.VISIBLE);
 
                 //Remove starting point
                 controls.remove(0);
@@ -182,6 +176,8 @@ public class TimingActivity extends Activity {
                         timing = true;
                         startBeep.start();
                         startButton.setVisibility(View.INVISIBLE);
+                        headingControl.setVisibility(View.VISIBLE);
+                        speed.setVisibility(View.VISIBLE);
                     }
                 }.start();
             }
@@ -199,8 +195,8 @@ public class TimingActivity extends Activity {
         Double cLon = control.getLongitude();
 
         //Radius around control where "punching" is allowed + GPS Accuracy!
-        Double rad = 0.00005
-                + (gps.getAccuracy() * Math.pow(10, -5));
+        Double rad = 0.00008
+                + ((gps.getAccuracy() / 4) * Math.pow(10, -5));
 
         if ((Math.pow((lat - cLat), 2) + Math.pow((lon - cLon), 2)) < (Math.pow(rad, 2))) {
             return true;
@@ -254,7 +250,6 @@ public class TimingActivity extends Activity {
                 controlBeep.start();
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(1000);
-                courseText.setText(Integer.toString(legTime));
 
                 //Next send legTime to the server
                 new controlTimingActivity(courseText).execute(Integer.toString(courseID), runner.getID(), Integer.toString(controlNumber), Integer.toString(legTime), Integer.toString(controlTime), uuid);
@@ -268,6 +263,7 @@ public class TimingActivity extends Activity {
                     chronometer.stop();
                     timing = false;
                     locationManager.removeUpdates(locationListener);
+                    chronometer.setTextColor(Color.parseColor("#e80000"));
                 }
             }
         }

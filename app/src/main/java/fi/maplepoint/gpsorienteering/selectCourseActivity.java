@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
@@ -29,6 +31,7 @@ public class selectCourseActivity extends Activity {
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
     static List<String> listDataHeader;
+    static ArrayList<Location> listLocations;
     static HashMap<String, ArrayList<Course>> listDataChild;
     LocationManager locationManager;
     LocationListener locationListener;
@@ -42,9 +45,13 @@ public class selectCourseActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.select_course);
         context = this;
-
+        final TextView loc = (TextView) findViewById(R.id.loginButton);
         runnerData = getIntent().getStringArrayExtra("Runner");
         final Runner runner = new Runner(runnerData[0], runnerData[1], runnerData[2], runnerData[3]);
 
@@ -87,7 +94,7 @@ public class selectCourseActivity extends Activity {
                         // preparing list data
                         prepareListData();
 
-                        listAdapter = new ExpandableListAdapter(context, listDataHeader, listDataChild);
+                        listAdapter = new ExpandableListAdapter(context, listDataHeader, listDataChild, listLocations);
 
                         // setting list adapter
                         expListView.setAdapter(listAdapter);
@@ -142,6 +149,7 @@ public class selectCourseActivity extends Activity {
     private void prepareListData() {
         listDataHeader = new ArrayList<>();
         listDataChild = new HashMap<>();
+        listLocations = new ArrayList<>();
 
         // Adding child data
         ArrayList<Course> courses;
@@ -153,7 +161,8 @@ public class selectCourseActivity extends Activity {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-            listDataHeader.add(getDistance(competitions.get(i).getStart(), current) +"km - " + competitions.get(i).getName());
+            listDataHeader.add(getDistance(competitions.get(i).getStart(), current) + "km - " + competitions.get(i).getName());
+            listLocations.add(competitions.get(i).getStart());
             listDataChild.put(listDataHeader.get(i), competitions.get(i).getCourses());
         }
     }

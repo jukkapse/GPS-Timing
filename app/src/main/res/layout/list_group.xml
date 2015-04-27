@@ -12,7 +12,7 @@
         android:layout_height="35dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Location"
-        android:id="@+id/location"
+        android:id="@+id/locationButton"
         android:clickable="true"
         android:textColor="#ffffffff"
         android:background="@drawable/button_start"

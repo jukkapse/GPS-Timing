@@ -4,6 +4,23 @@
     android:layout_height="match_parent"
     android:background="@mipmap/settings_view" >
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Select course"
+        android:id="@+id/textView2"
+        android:layout_gravity="center_horizontal"
+        android:textSize="50dp"
+        android:textColor="#ffffffff"
+        android:textStyle="bold"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:shadowColor="#ff000000"
+        android:shadowDx="0.0"
+        android:shadowDy="0.0"
+        android:shadowRadius="10.0"/>
+
     <ExpandableListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
