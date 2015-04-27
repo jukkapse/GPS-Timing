@@ -80,6 +80,7 @@ public class SigninActivity extends AsyncTask<String, Void, String[]> {
             context.startActivity(i);
         } else {
             statusField.setText("Invalid username or password!");
+            statusField.setVisibility(View.VISIBLE);
         }
     }
 }

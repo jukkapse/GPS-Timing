@@ -50,10 +50,10 @@ public class getControlsActivity extends AsyncTask<String, Void, ArrayList<Contr
                 } else if (i == 1) {
                     control.setCnum(line);
                 } else if (i == 2) {
-                    control.setLatitude(line);
+                    control.setLongitude(line);
 
                 } else {
-                    control.setLongitude(line);
+                    control.setLatitude(line);
                     controls.add(control);
                     i = -1;
                 }

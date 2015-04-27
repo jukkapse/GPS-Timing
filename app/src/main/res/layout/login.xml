@@ -148,8 +148,11 @@
         android:layout_marginTop="15dp"
         android:textColor="#ffe60000"
         android:visibility="invisible"
+        android:textStyle="bold"
         android:shadowColor="#ff000000"
-        android:textStyle="bold" />
+        android:shadowDx="0.0"
+        android:shadowDy="0.0"
+        android:shadowRadius="10.0"/>
 
     <Button
         style="?android:attr/buttonStyleSmall"

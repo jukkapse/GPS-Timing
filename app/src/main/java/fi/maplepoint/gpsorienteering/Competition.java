@@ -43,7 +43,7 @@ public class Competition {
         return this.location;
     }
 
-    public void setStart(String lat, String lon) {
+    public void setStart(String lon, String lat) {
         start.setLatitude(Double.parseDouble(lat));
         start.setLongitude(Double.parseDouble(lon));
     }

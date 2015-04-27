@@ -13,6 +13,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
@@ -35,6 +37,7 @@ public class selectCourseActivity extends Activity {
     private ProgressDialog waitingGPS;
     private String[] runnerData;
     Context context;
+    Location current;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +53,13 @@ public class selectCourseActivity extends Activity {
         waitingGPS.setMessage("Waiting for GPS-signal...");
         waitingGPS.show();
 
-
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 if (location.getAccuracy() < 70) {
+                    current = location;
                     try {
                         competitions = new getCompetitionActivity(context).execute(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude())).get();
                     } catch (InterruptedException e) {
@@ -102,7 +105,7 @@ public class selectCourseActivity extends Activity {
                                 i.putExtra("courseText", listDataChild.get(
                                         listDataHeader.get(groupPosition)).get(
                                         childPosition).getText());
-                                i.putExtra("compName", listDataHeader.get(groupPosition));
+                                i.putExtra("compName", competitions.get(groupPosition).getName());
                                 i.putExtra("runner", runner);
                                 startActivity(i);
 
@@ -150,7 +153,7 @@ public class selectCourseActivity extends Activity {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-            listDataHeader.add(competitions.get(i).getName());
+            listDataHeader.add(getDistance(competitions.get(i).getStart(), current) +"km - " + competitions.get(i).getName());
             listDataChild.put(listDataHeader.get(i), competitions.get(i).getCourses());
         }
     }
