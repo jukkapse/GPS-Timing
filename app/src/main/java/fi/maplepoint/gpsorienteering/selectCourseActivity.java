@@ -96,7 +96,7 @@ public class selectCourseActivity extends Activity {
                             public boolean onChildClick(ExpandableListView parent, View v,
                                                         int groupPosition, int childPosition, long id) {
                                 Intent i = new Intent(context, TimingActivity.class);
-                                i.putExtra("courseID",Integer.toString(listDataChild.get(
+                                i.putExtra("courseID", Integer.toString(listDataChild.get(
                                         listDataHeader.get(groupPosition)).get(
                                         childPosition).getID()));
                                 i.putExtra("courseText", listDataChild.get(
@@ -153,5 +153,19 @@ public class selectCourseActivity extends Activity {
             listDataHeader.add(competitions.get(i).getName());
             listDataChild.put(listDataHeader.get(i), competitions.get(i).getCourses());
         }
+    }
+
+    public String getDistance(Location location1, Location location2) {
+        Double distance = 0.0;
+        double d2r = Math.PI / 180;
+        double dlong = (location2.getLongitude() - location1.getLongitude()) * d2r;
+        double dlat = (location2.getLatitude() - location1.getLatitude()) * d2r;
+        double a = Math.pow(Math.sin(dlat / 2.0), 2)
+                + Math.cos(location1.getLatitude() * d2r)
+                * Math.cos(location2.getLatitude() * d2r)
+                * Math.pow(Math.sin(dlong / 2.0), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        distance += 6367 * c;
+        return String.format("%.2f", distance);
     }
 }

@@ -15,15 +15,15 @@
         android:textColor="#ffffffff"
         android:clickable="true"
         android:visibility="visible"
-        android:layout_below="@+id/distance"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dp" />
+        android:layout_marginTop="60dp"
+        android:layout_below="@+id/course" />
 
     <Chronometer
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/chronometer"
-        android:textSize="100dp"
+        android:textSize="110dp"
         android:textStyle="bold"
         android:textColor="#ffffffff"
         android:layout_alignParentTop="true"
@@ -41,7 +41,7 @@
         android:text="@string/firstname"
         android:id="@+id/firstname"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="30dp"
         android:textColor="#ffffffff"
         android:layout_centerHorizontal="true"
         android:textStyle="bold"
@@ -62,27 +62,27 @@
         android:singleLine="false"
         android:textColor="#ffffffff"
         android:textSize="20dp"
-        android:shadowColor="#000000"
+        android:shadowColor="#ff000000"
         android:shadowDx="0.0"
         android:shadowDy="0.0"
-        android:shadowRadius="6.0"/>
+        android:shadowRadius="10.0"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/distance"
-        android:id="@+id/distance"
-        android:layout_below="@+id/course"
+        android:text="Event"
+        android:id="@+id/event"
+        android:layout_below="@+id/chronometer"
         android:layout_centerHorizontal="true"
         android:textStyle="bold"
         android:textSize="30dp"
         android:textColor="#ffffffff"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:shadowColor="#ff000000"
         android:shadowDx="0.0"
         android:shadowDy="0.0"
-        android:shadowRadius="6.0"
+        android:shadowRadius="10.0"
         android:textAlignment="center" />
 
     <TextView
@@ -91,24 +91,10 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/course"
         android:id="@+id/course"
-        android:layout_below="@+id/chronometer"
+        android:layout_below="@+id/event"
         android:layout_centerHorizontal="true"
         android:textColor="#ffffffff"
         android:layout_marginTop="5dp"
-        android:shadowColor="#ff000000"
-        android:shadowDx="0.0"
-        android:shadowDy="0.0"
-        android:shadowRadius="6.0"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/count"
-        android:layout_alignBottom="@+id/startbutton"
-        android:layout_centerHorizontal="true"
-        android:textSize="60dp"
-        android:textColor="#ffffffff"
         android:shadowColor="#ff000000"
         android:shadowDx="0.0"
         android:shadowDy="0.0"
@@ -133,14 +119,48 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
+        android:text="Current Speed"
         android:id="@+id/speed"
-        android:layout_below="@+id/distance"
+        android:layout_below="@+id/ctrl"
         android:layout_centerHorizontal="true"
         android:textColor="#ffffffff"
         android:textSize="20dp"
         android:shadowColor="#ff000000"
         android:shadowDx="0.0"
         android:shadowDy="0.0"
-        android:shadowRadius="8.0"/>
+        android:shadowRadius="10.0"
+        android:layout_marginTop="10dp"
+        android:singleLine="true"
+        android:visibility="invisible" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Starting"
+        android:id="@+id/startingDist"
+        android:textColor="#ffffffff"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/startbutton"
+        android:layout_marginTop="10dp"
+        android:shadowColor="#ff000000"
+        android:shadowDx="0.0"
+        android:shadowDy="0.0"
+        android:shadowRadius="10.0"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Ctrl left"
+        android:id="@+id/ctrl"
+        android:layout_below="@+id/course"
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffffff"
+        android:layout_marginTop="30dp"
+        android:visibility="invisible"
+        android:shadowColor="#ff000000"
+        android:shadowDx="0.0"
+        android:shadowDy="0.0"
+        android:shadowRadius="10.0"/>
 </RelativeLayout>

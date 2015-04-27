@@ -32,10 +32,10 @@ public class TimingActivity extends Activity {
     LocationManager locationManager;
     LocationListener locationListener;
     MediaPlayer controlBeep, startBeep;
-    TextView firstnameText, lastnameText, courseText, clubText, distanceText, speed;
+    TextView firstnameText, lastnameText, courseText, clubText, eventText, speed, startingDist, headingControl;
     ArrayList<Integer> legTimes;
 
-  //  ArrayList<Double[]> courseData;
+    //  ArrayList<Double[]> courseData;
     String compName, course, uuid;
     Runner runner;
     ArrayList<Control> controls;
@@ -68,7 +68,7 @@ public class TimingActivity extends Activity {
             e.printStackTrace();
         }
         legTimes = new ArrayList<>();
-        
+
         controlNumber = 1;
         timing = false;
         controlTime = 0;
@@ -93,16 +93,16 @@ public class TimingActivity extends Activity {
         firstnameText = (TextView) findViewById(R.id.firstname);
         lastnameText = (TextView) findViewById(R.id.lastname);
         clubText = (TextView) findViewById(R.id.clubtext);
-        distanceText = (TextView) findViewById(R.id.distance);
+        eventText = (TextView) findViewById(R.id.event);
         speed = (TextView) findViewById(R.id.speed);
+        startingDist = (TextView) findViewById(R.id.startingDist);
+        headingControl = (TextView) findViewById(R.id.ctrl);
 
         courseText.setText(course);
         firstnameText.setText(runner.getFirstname());
         lastnameText.setText(runner.getLastname());
         clubText.setText(runner.getClub());
-        distanceText.setText(compName);
-        //Show course distance
-        //distanceText.setText(getDistance(controls) + " km\n" + (controls.size() - 1) + " Controls");
+        eventText.setText(compName);
 
         //Check if GPS is enabled!
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -112,16 +112,18 @@ public class TimingActivity extends Activity {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-
+                startingDist.setText("Distance to start: " + getDistance(location, controls.get(0).getLocation()) + "km");
                 //Show GPS Accuracy
-           //     courseText.setText("Accuracy: " + location.getAccuracy() + "m");
+                //     courseText.setText("Accuracy: " + location.getAccuracy() + "m");
 
                 //Show starting button if standing at starting place and GPS accuracy is better than 20m.
                 if (!timing && insideArea(location, controls.get(0).getLocation())) {
                     if (location.getAccuracy() > 20) {
                         startButton.setVisibility(View.INVISIBLE);
+                        startingDist.setVisibility(View.VISIBLE);
                     } else {
                         startButton.setVisibility(View.VISIBLE);
+                        startingDist.setVisibility(View.VISIBLE);
                     }
                 }
 
@@ -129,7 +131,7 @@ public class TimingActivity extends Activity {
                 checkControl(location, controls.get(0).getLocation());
 
                 //Show speed min/km
-                speed.setText("" + String.format("%.2f", (16.666666667 / location.getSpeed())) + " min/km");
+                speed.setText("Current speed: " + String.format("%.2f", (16.666666667 / location.getSpeed())) + " min/km");
             }
 
             @Override
@@ -153,6 +155,8 @@ public class TimingActivity extends Activity {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                headingControl.setVisibility(View.VISIBLE);
+                speed.setVisibility(View.VISIBLE);
 
                 //Remove starting point
                 controls.remove(0);
@@ -253,7 +257,7 @@ public class TimingActivity extends Activity {
                 courseText.setText(Integer.toString(legTime));
 
                 //Next send legTime to the server
-                new controlTimingActivity(courseText).execute(Integer.toString(courseID), runner.getID(), Integer.toString(controlNumber), Integer.toString(legTime),Integer.toString(controlTime), uuid);
+                new controlTimingActivity(courseText).execute(Integer.toString(courseID), runner.getID(), Integer.toString(controlNumber), Integer.toString(legTime), Integer.toString(controlTime), uuid);
 
                 //Remove punched control from controls list
                 controls.remove(0);
@@ -270,21 +274,18 @@ public class TimingActivity extends Activity {
     }
 
     //Calculate route distance and return it as 2 decimal String.
-    public String getDistance(ArrayList<Location> controls) {
+    public String getDistance(Location location1, Location location2) {
         Double distance = 0.0;
         double d2r = Math.PI / 180;
-        if (controls.size() > 1) {
-            for (int i = 0; i < controls.size() - 1; i++) {
-                double dlong = (controls.get(i + 1).getLongitude() - controls.get(i).getLongitude()) * d2r;
-                double dlat = (controls.get(i + 1).getLatitude() - controls.get(i).getLatitude()) * d2r;
-                double a = Math.pow(Math.sin(dlat / 2.0), 2)
-                        + Math.cos(controls.get(i).getLatitude() * d2r)
-                        * Math.cos(controls.get(i + 1).getLatitude() * d2r)
-                        * Math.pow(Math.sin(dlong / 2.0), 2);
-                double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                distance += 6367 * c;
-            }
-        }
+        double dlong = (location2.getLongitude() - location1.getLongitude()) * d2r;
+        double dlat = (location2.getLatitude() - location1.getLatitude()) * d2r;
+        double a = Math.pow(Math.sin(dlat / 2.0), 2)
+                + Math.cos(location1.getLatitude() * d2r)
+                * Math.cos(location2.getLatitude() * d2r)
+                * Math.pow(Math.sin(dlong / 2.0), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        distance += 6367 * c;
+
         return String.format("%.2f", distance);
     }
 }
