@@ -107,7 +107,7 @@ public class TimingActivity extends Activity {
             public void onLocationChanged(Location location) {
                 startingDist.setText("Distance to start: " + getDistance(location, controls.get(0).getLocation()) + "km");
                 //Show GPS Accuracy
-                //     courseText.setText("Accuracy: " + location.getAccuracy() + "m");
+                //    courseText.setText("Accuracy: " + location.getAccuracy() + "m");
 
                 //Show starting button if standing at starting place and GPS accuracy is better than 20m.
                 if (!timing && insideArea(location, controls.get(0).getLocation())) {
@@ -196,7 +196,7 @@ public class TimingActivity extends Activity {
 
         //Radius around control where "punching" is allowed + GPS Accuracy!
         Double rad = 0.00008
-                + ((gps.getAccuracy() / 4) * Math.pow(10, -5));
+                + ((gps.getAccuracy() / 3) * Math.pow(10, -5));
 
         if ((Math.pow((lat - cLat), 2) + Math.pow((lon - cLon), 2)) < (Math.pow(rad, 2))) {
             return true;

@@ -65,7 +65,7 @@ public class selectCourseActivity extends Activity {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                if (location.getAccuracy() < 70) {
+                if (location.getAccuracy() < 500) {
                     current = location;
                     try {
                         competitions = new getCompetitionActivity(context).execute(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude())).get();

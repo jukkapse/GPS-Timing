@@ -33,7 +33,7 @@ public class getCourseActivity extends AsyncTask<String, Void, ArrayList<Course>
     protected ArrayList<Course> doInBackground(String... arg0) {
         try {
             String id = arg0[0];
-            String link = "http://outdoorathletics.fi/gps-timing/libs/load_courses.php";
+            String link = "http://outdoorathletics.fi/gps-timing/mobilelibs/load_courses.php";
             String data = URLEncoder.encode("id", "UTF-8")
                     + "=" + URLEncoder.encode(id, "UTF-8");
             URL url = new URL(link);

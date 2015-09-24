@@ -31,7 +31,7 @@ public class controlTimingActivity extends AsyncTask<String, Void, String> {
             String controltime = arg0[4];
             String uuid = arg0[5];
 
-            String link = "http://outdoorathletics.fi/gps-timing/libs/add_ctime.php";
+            String link = "http://outdoorathletics.fi/gps-timing/mobilelibs/add_ctime.php";
             String data = URLEncoder.encode("cid", "UTF-8")
                     + "=" + URLEncoder.encode(cid, "UTF-8");
             data += "&" + URLEncoder.encode("uid", "UTF-8")

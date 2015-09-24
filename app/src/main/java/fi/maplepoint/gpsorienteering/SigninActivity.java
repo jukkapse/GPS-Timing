@@ -43,7 +43,7 @@ public class SigninActivity extends AsyncTask<String, Void, String[]> {
         try {
             String username = arg0[0];
             String password = arg0[1];
-            String link = "http://outdoorathletics.fi/gps-timing/libs/login.php";
+            String link = "http://outdoorathletics.fi/gps-timing/mobilelibs/login.php";
             String data = URLEncoder.encode("username", "UTF-8")
                     + "=" + URLEncoder.encode(username, "UTF-8");
             data += "&" + URLEncoder.encode("password", "UTF-8")

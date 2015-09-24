@@ -32,7 +32,7 @@ public class getCompetitionActivity extends AsyncTask<String, Void, ArrayList<Co
         try {
             String lat = arg0[0];
             String lon = arg0[1];
-            String link = "http://outdoorathletics.fi/gps-timing/libs/load_comps.php";
+            String link = "http://outdoorathletics.fi/gps-timing/mobilelibs/load_comps.php";
             String data = URLEncoder.encode("lat", "UTF-8")
                     + "=" + URLEncoder.encode(lat, "UTF-8");
             data += "&" + URLEncoder.encode("lon", "UTF-8")
