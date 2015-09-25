@@ -42,12 +42,14 @@ public class TimingActivity extends Activity {
     Boolean timing;
     Integer courseID, controlNumber, totalControls, controlTime;
     Context context;
+    Integer locationCheck;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.active_view);
 
+        this.locationCheck = 0;
         this.courseID = Integer.parseInt(getIntent().getStringExtra("courseID"));
         this.course = getIntent().getStringExtra("courseText");
         this.compName = getIntent().getStringExtra("compName");
@@ -234,10 +236,10 @@ public class TimingActivity extends Activity {
 
         //Check if GPS location is insideArea control radius
         if (insideArea(gps, control)) {
-
+            locationCheck++;
             //Punch control if timing is running
-            int legTime = 0;
-            if (timing) {
+            int legTime;
+            if (timing && locationCheck == 2) {
                 if (legTimes.isEmpty()) {
                     legTime = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000);
                 } else {
@@ -257,6 +259,7 @@ public class TimingActivity extends Activity {
                 //Remove punched control from controls list
                 controls.remove(0);
                 controlNumber++;
+                locationCheck = 0;
 
                 //When no controls left -> Stop Chronometer and GPS
                 if (controls.isEmpty()) {
